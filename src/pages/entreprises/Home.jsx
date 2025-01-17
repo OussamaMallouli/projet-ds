@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { Table, Button } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Table, Button, Container } from "react-bootstrap";
 
 const Home = () => {
   const [entreprises, setEntreprises] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -20,51 +21,72 @@ const Home = () => {
       .catch((error) => console.error("Error deleting entreprise:", error));
   };
 
+  const handleRowClick = (id) => {
+    navigate(`/entreprises/details/${id}`);
+  };
+
   return (
     <div>
-      <h1>Entreprises</h1>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Description</th>
-            <th>Creation Date</th>
-            <th>Logo</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entreprises.map((ent) => (
-            <tr key={ent.id}>
-              <td>{ent.id}</td>
-              <td>{ent.nomEntreprise}</td>
-              <td>{ent.email}</td>
-              <td>{ent.numTel}</td>
-              <td>{ent.description}</td>
-              <td>{ent.dateDeCreation}</td>
-              <td>
-                <img src={ent.logo} alt="Logo" width="50" />
-              </td>
-              <td>
-                <Button
-                  as={Link}
-                  to={`/entreprises/edit/${ent.id}`}
-                  variant="warning"
-                  className="me-2"
-                >
-                  Edit
-                </Button>
-                <Button onClick={() => handleDelete(ent.id)} variant="danger">
-                  Delete
-                </Button>
-              </td>
+      <Container>
+        <h1>Entreprises</h1>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Description</th>
+              <th>Creation Date</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {entreprises.map((ent) => (
+              <tr
+                key={ent.id}
+                onClick={() => handleRowClick(ent.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>
+                  <img
+                    src={ent.logo}
+                    alt="Logo"
+                    className="d-block mx-auto"
+                    width="75"
+                    height="75"
+                  />
+                </td>
+                <td>{ent.nomEntreprise}</td>
+                <td>{ent.email}</td>
+                <td>{ent.numTel}</td>
+                <td>{ent.description}</td>
+                <td>{ent.dateDeCreation.slice(0, -1)}</td>
+                <td>
+                  <Button
+                    as={Link}
+                    to={`/entreprises/edit/${ent.id}`}
+                    variant="warning"
+                    className="me-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(ent.id);
+                    }}
+                    variant="danger"
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Container>
     </div>
   );
 };

@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Container, Card, Row, Col, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Details = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
   const [technology, setTechnology] = useState(null);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     axios
@@ -45,9 +53,6 @@ const Details = () => {
                 <strong>Version:</strong> {technology.version}
               </Card.Text>
               <Card.Text>
-                <strong>Description:</strong> {technology.description}
-              </Card.Text>
-              <Card.Text>
                 <strong>Platform:</strong> {technology.plateformSupporte}
               </Card.Text>
               <Card.Text>
@@ -63,6 +68,9 @@ const Details = () => {
               <Card.Text>
                 <strong>Last Update:</strong>{" "}
                 {technology.dateDerniereMAJ.slice(0, 10)}
+              </Card.Text>
+              <Card.Text>
+                <strong>Description:</strong> {technology.description}
               </Card.Text>
             </Col>
           </Row>

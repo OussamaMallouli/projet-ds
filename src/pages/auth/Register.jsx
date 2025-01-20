@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUser, FaLock } from "react-icons/fa";
+import { login } from "../../redux/userSlice";
+import { useDispatch } from "react-redux";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -15,8 +19,13 @@ const Register = () => {
         username,
         password,
       })
-      .then(() => navigate("/entreprises"))
-      .catch((error) => console.error("Error registering:", error));
+      .then(() => {
+        dispatch(login({ username }));
+        navigate("/entreprises");
+      })
+      .catch((error) => {
+        setError(error.response?.data?.error || "Error registering");
+      });
   };
 
   return (
@@ -33,6 +42,7 @@ const Register = () => {
         }}
       >
         <h2 className="text-center mb-4">Register</h2>
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Username:</label>

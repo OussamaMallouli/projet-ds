@@ -8,6 +8,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,7 +23,9 @@ const Login = () => {
         dispatch(login(response.data));
         navigate("/entreprises");
       })
-      .catch((error) => console.error("Error logging in:", error));
+      .catch((error) => {
+        setError(error.response?.data?.error || "Error logging in");
+      });
   };
 
   return (
@@ -37,6 +40,7 @@ const Login = () => {
         }}
       >
         <h2 className="text-center mb-4">Login</h2>
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Username:</label>

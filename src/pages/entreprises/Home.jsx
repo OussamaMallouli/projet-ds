@@ -2,17 +2,24 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Table, Button, Container } from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const [entreprises, setEntreprises] = useState([]);
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8081/Projet/webapi/entreprises")
-      .then((response) => setEntreprises(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    } else {
+      axios
+        .get("http://localhost:8081/Projet/webapi/entreprises")
+        .then((response) => setEntreprises(response.data))
+        .catch((error) => console.error("Error fetching data:", error));
+    }
+  }, [user, navigate]);
 
   const handleDelete = (id) => {
     axios
@@ -29,6 +36,15 @@ const Home = () => {
     <div>
       <Container>
         <h1>Entreprises</h1>
+        <Button
+          as={Link}
+          to="/entreprises/create"
+          variant="success"
+          className="mb-3 mt-2"
+        >
+          <FaPlus className="me-2" />
+          Create New Entreprise
+        </Button>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -36,7 +52,6 @@ const Home = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
-              <th>Description</th>
               <th>Creation Date</th>
               <th>Actions</th>
             </tr>
@@ -60,7 +75,6 @@ const Home = () => {
                 <td>{ent.nomEntreprise}</td>
                 <td>{ent.email}</td>
                 <td>{ent.numTel}</td>
-                <td>{ent.description}</td>
                 <td>{ent.dateDeCreation.slice(0, -1)}</td>
                 <td>
                   <Button

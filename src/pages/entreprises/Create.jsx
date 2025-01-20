@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Col, Row, Container, Spinner } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
+import { useToast } from "../../context/ToastContext";
+import { useSelector } from "react-redux";
 
 const Create = () => {
   const [formData, setFormData] = useState({
@@ -18,13 +20,24 @@ const Create = () => {
   const [technologies, setTechnologies] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
+  const { showToastMessage } = useToast();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     axios
       .get("http://localhost:8081/Projet/webapi/technologies")
       .then((response) => setTechnologies(response.data))
-      .catch((error) => console.error("Error fetching technologies:", error));
-  }, []);
+      .catch((error) => {
+        console.error("Error fetching technologies:", error);
+        showToastMessage("Error fetching technologies", "danger");
+      });
+  }, [showToastMessage]);
 
   const handleChange = (e) => {
     setFormData({
@@ -69,17 +82,25 @@ const Create = () => {
         })
         .then(() => {
           setIsUploading(false);
+          showToastMessage("Entreprise created successfully", "success");
           navigate("/entreprises");
         })
         .catch((error) => {
           console.error("Error creating entreprise:", error);
+          showToastMessage("Error creating entreprise", "danger");
           setIsUploading(false);
         });
     } else {
       axios
         .post("http://localhost:8081/Projet/webapi/entreprises", formData)
-        .then(() => navigate("/entreprises"))
-        .catch((error) => console.error("Error creating entreprise:", error));
+        .then(() => {
+          showToastMessage("Entreprise created successfully", "success");
+          navigate("/entreprises");
+        })
+        .catch((error) => {
+          console.error("Error creating entreprise:", error);
+          showToastMessage("Error creating entreprise", "danger");
+        });
     }
   };
 

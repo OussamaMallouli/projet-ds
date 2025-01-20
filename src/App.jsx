@@ -1,8 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { Container, Navbar, Nav } from "react-bootstrap";
-import { Provider, useSelector, useDispatch } from "react-redux";
-import store from "./redux/store";
+import { Route, Routes, Link } from "react-router-dom";
+import { Navbar, Nav, Button } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
 import Technologies from "./pages/technologies/Home";
 import CreateTechnologie from "./pages/technologies/Create";
 import EditTechnologie from "./pages/technologies/Edit";
@@ -13,18 +12,13 @@ import EditEntreprise from "./pages/entreprises/Edit";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Details from "./pages/entreprises/Details";
-import { login, logout } from "./redux/userSlice";
+import { logout } from "./redux/userSlice";
+import { FaSignOutAlt, FaUser } from "react-icons/fa";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
-  return (
-    <Provider store={store}>
-      <Router>
-        <AppContent />
-      </Router>
-    </Provider>
-  );
+  return <AppContent />;
 };
 
 const AppContent = () => {
@@ -73,12 +67,16 @@ const AppContent = () => {
             </Nav.Link>
           </Nav>
           <Nav className="ms-auto">
-            <Navbar.Text className="me-3">
-              Signed in as: {user.user?.username}
+            <Navbar.Text className="me-3 text-white">
+              Signed in as: <FaUser className="me-1 mb-1" />
+              <span className="text-info"> {user.user?.username}</span>
             </Navbar.Text>
-            <Nav.Link as={Link} to="/" onClick={handleLogout}>
-              Logout
-            </Nav.Link>
+            <Button variant="outline-danger" size="sm" className="me-3">
+              <Nav.Link as={Link} to="/" onClick={handleLogout}>
+                <FaSignOutAlt color="white" size={18} className="me-1 mb-1" />
+                <span className="text-white">Logout</span>
+              </Nav.Link>
+            </Button>
           </Nav>
         </Navbar>
       )}

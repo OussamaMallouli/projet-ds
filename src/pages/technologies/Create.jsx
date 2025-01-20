@@ -1,8 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Col, Row, Container, Spinner } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
+import { useToast } from "../../context/ToastContext";
+import { useSelector } from "react-redux";
 
 const Create = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,14 @@ const Create = () => {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
+  const { showToastMessage } = useToast();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -51,17 +61,25 @@ const Create = () => {
         })
         .then(() => {
           setIsUploading(false);
+          showToastMessage("Technologie created successfully", "success");
           navigate("/technologies");
         })
         .catch((error) => {
           console.error("Error creating technologie:", error);
+          showToastMessage("Error creating technologie", "danger");
           setIsUploading(false);
         });
     } else {
       axios
         .post("http://localhost:8081/Projet/webapi/technologies", formData)
-        .then(() => navigate("/technologies"))
-        .catch((error) => console.error("Error creating technologie:", error));
+        .then(() => {
+          showToastMessage("Technologie created successfully", "success");
+          navigate("/technologies");
+        })
+        .catch((error) => {
+          console.error("Error creating technologie:", error);
+          showToastMessage("Error creating technologie", "danger");
+        });
     }
   };
 

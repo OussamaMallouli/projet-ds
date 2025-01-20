@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, Button, Container, Row, Col, Spinner } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
+import { useToast } from "../../context/ToastContext";
+import { useSelector } from "react-redux";
 
 const Edit = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,14 @@ const Edit = () => {
   const [isUploading, setIsUploading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToastMessage } = useToast();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     axios
@@ -27,13 +37,19 @@ const Edit = () => {
         setFormData(response.data);
         setTechIds(response.data.listTech.map((tech) => tech.id.toString()));
       })
-      .catch((error) => console.error("Error fetching entreprise:", error));
+      .catch((error) => {
+        console.error("Error fetching entreprise:", error);
+        showToastMessage("Error fetching entreprise", "danger");
+      });
 
     axios
       .get("http://localhost:8081/Projet/webapi/technologies")
       .then((response) => setTechnologies(response.data))
-      .catch((error) => console.error("Error fetching technologies:", error));
-  }, [id]);
+      .catch((error) => {
+        console.error("Error fetching technologies:", error);
+        showToastMessage("Error fetching technologies", "danger");
+      });
+  }, [id, showToastMessage]);
 
   const handleChange = (e) => {
     setFormData({
@@ -48,7 +64,6 @@ const Edit = () => {
     checked
       ? setTechIds((prevTechIds) => [...prevTechIds, value])
       : setTechIds(techIds.filter((id) => id !== value));
-    console.log(techIds);
   };
 
   const handleSubmit = (e) => {
@@ -62,8 +77,14 @@ const Edit = () => {
         `http://localhost:8081/Projet/webapi/entreprises/${id}`,
         updatedFormData
       )
-      .then(() => navigate("/entreprises"))
-      .catch((error) => console.error("Error updating entreprise:", error));
+      .then(() => {
+        showToastMessage("Entreprise updated successfully", "success");
+        navigate("/entreprises");
+      })
+      .catch((error) => {
+        console.error("Error updating entreprise:", error);
+        showToastMessage("Error updating entreprise", "danger");
+      });
   };
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -130,7 +151,7 @@ const Edit = () => {
               <Form.Group controlId="formDescription" className="mt-3">
                 <Form.Label className="fw-bold">Description</Form.Label>
                 <Form.Control
-                  type="text"
+                  as="textarea"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}

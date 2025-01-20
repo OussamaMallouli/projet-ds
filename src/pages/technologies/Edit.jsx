@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, Button, Container, Row, Col, Spinner } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
+import { useToast } from "../../context/ToastContext";
+import { useSelector } from "react-redux";
 
 const Edit = () => {
   const [formData, setFormData] = useState({
@@ -17,13 +19,24 @@ const Edit = () => {
   const [isUploading, setIsUploading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToastMessage } = useToast();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     axios
       .get(`http://localhost:8081/Projet/webapi/technologies/${id}`)
       .then((response) => setFormData(response.data))
-      .catch((error) => console.error("Error fetching technologie:", error));
-  }, [id]);
+      .catch((error) => {
+        console.error("Error fetching technologie:", error);
+        showToastMessage("Error fetching technologie", "danger");
+      });
+  }, [id, showToastMessage]);
 
   const handleChange = (e) => {
     setFormData({
@@ -36,8 +49,14 @@ const Edit = () => {
     e.preventDefault();
     axios
       .put(`http://localhost:8081/Projet/webapi/technologies/${id}`, formData)
-      .then(() => navigate("/technologies"))
-      .catch((error) => console.error("Error updating technologie:", error));
+      .then(() => {
+        showToastMessage("Technologie updated successfully", "success");
+        navigate("/technologies");
+      })
+      .catch((error) => {
+        console.error("Error updating technologie:", error);
+        showToastMessage("Error updating technologie", "danger");
+      });
   };
 
   const onDrop = useCallback((acceptedFiles) => {

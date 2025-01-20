@@ -3,11 +3,19 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Row, Col, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useSelector } from "react-redux";
 
 const Details = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
   const [enterprise, setEnterprise] = useState(null);
+
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     axios
@@ -48,13 +56,13 @@ const Details = () => {
                 <strong>Phone:</strong> {enterprise.numTel}
               </Card.Text>
               <Card.Text>
-                <strong>Description:</strong> {enterprise.description}
-              </Card.Text>
-              <Card.Text>
                 <strong>Creation Date:</strong>{" "}
                 {enterprise.dateDeCreation.slice(0, -1)}
               </Card.Text>
               <Card.Text>
+                <strong>Description:</strong> {enterprise.description}
+              </Card.Text>
+              <div>
                 <strong>Technologies:</strong>
                 <Row className="mt-2">
                   {enterprise.listTech.map((tech) => (
@@ -74,7 +82,7 @@ const Details = () => {
                     </Col>
                   ))}
                 </Row>
-              </Card.Text>
+              </div>
             </Col>
           </Row>
         </Card.Body>

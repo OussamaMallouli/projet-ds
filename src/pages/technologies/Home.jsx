@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Table, Button, Container } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { FaPlus } from "react-icons/fa";
 
 const Home = () => {
   const [technologies, setTechnologies] = useState([]);
@@ -37,14 +38,21 @@ const Home = () => {
     <div>
       <Container>
         <h1>Technologies</h1>
+        <Button
+          as={Link}
+          to="/technologies/create"
+          variant="success"
+          className="mb-3 mt-2"
+        >
+          <FaPlus className="me-2" />
+          Create New Technology
+        </Button>
         <Table striped bordered hover>
           <thead>
             <tr>
               <th>Logo</th>
               <th>Name</th>
               <th>Version</th>
-              <th>Description</th>
-              <th>Platform</th>
               <th>Website</th>
               <th>Last Update</th>
               <th>Actions</th>
@@ -68,8 +76,6 @@ const Home = () => {
                 </td>
                 <td>{tech.nomTech}</td>
                 <td>{tech.version}</td>
-                <td>{tech.description}</td>
-                <td>{tech.plateformSupporte}</td>
                 <td>{tech.siteWeb}</td>
                 <td>{tech.dateDerniereMAJ.slice(0, -1)}</td>
                 <td>
